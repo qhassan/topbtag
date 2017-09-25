@@ -345,13 +345,14 @@ histContainer_["nselmuons"]->Fill(selectedMuons.size());
     {
       if(j.pt()>30) njets30++;
       selectedJets.push_back( &j );
-      float csv=j.bDiscriminator("combinedSecondaryVertexBJetTags");
+//      float csv=j.bDiscriminator("combinedSecondaryVertexBJetTags");
+      float csv=j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
       if(csv>0.800) nBtags++;
-//      histContainer_["jetcsv"]->Fill(nBtags);
+      histContainer_["jetcsv"]->Fill(csv);
       histContainer_["jetpileupid"]->Fill(j.userFloat("pileupJetId:fullDiscriminant"));
       nj++;
     }
-  histContainer_["jetcsv"]->Fill(nBtags);
+//  histContainer_["jetcsv"]->Fill(csv);
   histContainer_["nseljets"]->Fill(selectedJets.size());
   histContainer_["nseljetsfull"]->Fill(njets30);
 

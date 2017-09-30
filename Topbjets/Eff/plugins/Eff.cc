@@ -41,6 +41,13 @@
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 
+#include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
+#include "DataFormats/EgammaCandidates/interface/Conversion.h"
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
@@ -233,6 +240,21 @@ histContainer_["nselmuons"]->Fill(selectedMuons.size());
       bool passPt(el.pt()>30);
       bool passVetoPt(el.pt()>20);
       bool passEta(fabs(el.eta()) < 2.5 && (fabs(el.superCluster()->eta()) < 1.4442 || fabs(el.superCluster()->eta()) > 1.5660));
+
+      //use a cut based id
+      bool passVetoId( EgammaCutBasedEleId::PassWP( EgammaCutBasedEleId::VETO, el.isEB(), el.pt(), el.eta(),
+                el.deltaEtaSuperClusterTrackAtVtx(),
+                el.deltaPhiSuperClusterTrackAtVtx(),
+                el.sigmaIetaIeta(),
+                el.hadronicOverEm(),
+                (1.0/el.ecalEnergy() - el.eSuperClusterOverP()/el.ecalEnergy()),
+                fabs(el.gsfTrack()->dxy(primVtx.position())),
+                fabs(el.gsfTrack()->dz(primVtx.position())),
+                                                  0., 0., 0.,
+                !(el.passConversionVeto()),
+            //    el.gsfTrack()->trackerExpectedHitsInner().numberOfLostHits(),
+                el.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS),
+                rho) );
 
       //isolation
       float relchIso((el.chargedHadronIso())/el.pt());
